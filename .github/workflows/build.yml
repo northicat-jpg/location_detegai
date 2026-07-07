@@ -13,29 +13,41 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 设置 Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: 安装依赖
+      - name: 在 Ubuntu 20.04 Docker 中构建（兼容旧版 glibc 2.31）
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            arm64v8/ubuntu:20.04 \
+            bash -c '
+              set -e
+              # 更新源并安装基础工具
+              apt-get update
+              apt-get install -y software-properties-common
 
-      - name: 用 PyInstaller 构建可执行文件
-        run: |
-          pyinstaller \
-            --onefile \
-            --name location_detection \
-            --add-data "config.json.example:." \
-            main.py
+              # 安装 Python 3.10（Ubuntu 20.04 默认 3.8，需要 deadsnakes）
+              add-apt-repository -y ppa:deadsnakes/ppa
+              apt-get update
+              apt-get install -y python3.10 python3.10-distutils python3-pip
 
-      - name: 验证产物
-        run: |
-          ls -lh dist/
-          file dist/location_detection
+              # 安装 pip 并升级
+              python3.10 -m pip install --upgrade pip
+
+              # 安装项目依赖
+              python3.10 -m pip install -r requirements.txt
+              python3.10 -m pip install pyinstaller
+
+              # PyInstaller 打包
+              python3.10 -m PyInstaller \
+                --onefile \
+                --name location_detection \
+                --add-data "config.json.example:." \
+                main.py
+
+              # 验证
+              ls -lh dist/
+              file dist/location_detection
+            '
 
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
