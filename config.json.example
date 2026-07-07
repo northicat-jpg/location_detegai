@@ -1,0 +1,19 @@
+{
+    "tcp_host": "0.0.0.0",
+    "tcp_port": 8080,
+    "tcp_backlog": 64,
+    "sensor_baud": 9600,
+    "read_timeout": 2.0,
+    "measure_interval": 0.5,
+    "distance_threshold_mm": 2500,
+    "client_location_map": {
+        "191.13.15.200:6060": "WB-1",
+        "191.13.15.200:6070": "WA-1"
+    },
+    "mysql_url": "127.0.0.1",
+    "mysql_port": 3306,
+    "mysql_username": "root",
+    "mysql_password": "your_password_here",
+    "mysql_name": "rcs",
+    "db_pool_size": 10
+}
