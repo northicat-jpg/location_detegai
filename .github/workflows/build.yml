@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: 检出代码
-        uses: actions/checkout@v4.2
+        uses: actions/checkout@v4
 
       - name: 设置 Python 3.10
-        uses: actions/setup-python@v5.6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -39,7 +39,7 @@ jobs:
           ldd dist/location_detection 2>/dev/null || true
 
       - name: 上传构建产物
-        uses: actions/upload-artifact@v4.6
+        uses: actions/upload-artifact@v4
         with:
           name: location_detection-linux-arm64
           path: dist/location_detection
