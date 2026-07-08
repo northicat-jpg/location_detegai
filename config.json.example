@@ -5,6 +5,7 @@
     "sensor_baud": 9600,
     "read_timeout": 2.0,
     "measure_interval": 0.5,
+    "query_interval": 5.0,
     "distance_threshold_mm": 2500,
     "client_location_map": {
         "191.13.15.200:6060": "WB-1",

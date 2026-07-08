@@ -15,7 +15,7 @@ import sys
 import db
 
 from tcp_server import TCPServer
-from config import TCP_HOST, TCP_PORT, MEASURE_INTERVAL, DISTANCE_THRESHOLD_MM, CLIENT_LOCATION_MAP
+from config import TCP_HOST, TCP_PORT, MEASURE_INTERVAL, QUERY_INTERVAL, DISTANCE_THRESHOLD_MM, CLIENT_LOCATION_MAP
 
 
 
@@ -85,7 +85,7 @@ def main():
     parser = argparse.ArgumentParser(description="超声波库位检测系统")
     parser.add_argument("--host", default=TCP_HOST, help=f"监听地址 (默认 {TCP_HOST})")
     parser.add_argument("--port", type=int, default=TCP_PORT, help=f"监听端口 (默认 {TCP_PORT})")
-    parser.add_argument("--interval", type=float, default=MEASURE_INTERVAL, help=f"测距间隔秒数 (默认 {MEASURE_INTERVAL})")
+    parser.add_argument("--interval", type=float, default=QUERY_INTERVAL, help=f"查询+SQL更新间隔秒数 (默认 {QUERY_INTERVAL}s)")
     parser.add_argument("--once", action="store_true", help="单次测距后退出")
     parser.add_argument("--monitor", action="store_true", help="自动上报监控模式")
     args = parser.parse_args()

@@ -52,6 +52,7 @@ TCP_BACKLOG = _cfg.get("tcp_backlog", 64)
 SENSOR_BAUD = _cfg.get("sensor_baud", 9600)
 READ_TIMEOUT = _cfg.get("read_timeout", 2.0)
 MEASURE_INTERVAL = _cfg.get("measure_interval", 0.5)
+QUERY_INTERVAL = _cfg.get("query_interval", 5.0)
 DISTANCE_THRESHOLD_MM = _cfg.get("distance_threshold_mm", 2500)
 
 # === 客户端到库位编码映射 ===
