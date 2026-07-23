@@ -1,4 +1,4 @@
-name: Build Linux ARM Executable
+name: Build ARM64 Executable (glibc 2.31)
 
 on:
   push:
@@ -7,40 +7,53 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04-arm  # ARM Linux (glibc 2.35, 兼容多数 ARM Linux)
+    # ARM64 物理硬件（非模拟），原生 Docker，无 QEMU 性能损失
+    runs-on: ubuntu-22.04-arm
 
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 设置 Python 3.10
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-
-      - name: 安装依赖
+      - name: 在 Ubuntu 20.04 Docker 容器中构建
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
+          # 在 ARM64 原生 Docker 中运行 Ubuntu 20.04 容器
+          # glibc 2.31 → 与 Lubuntu 20.04 完全兼容
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            arm64v8/ubuntu:20.04 \
+            bash -c "
+              set -e
 
-      - name: PyInstaller 打包
-        run: |
-          pyinstaller \
-            --onefile \
-            --name location_detection \
-            --add-data "config.json.example:." \
-            main.py
+              echo '[1/5] apt-get update...'
+              apt-get update -qq
+
+              echo '[2/5] 安装 Python 3.10 + pip...'
+              apt-get install -y -qq software-properties-common
+              add-apt-repository -y ppa:deadsnakes/ppa -u
+              apt-get install -y -qq python3.10 python3.10-distutils python3.10-venv
+              wget -q https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
+              python3.10 /tmp/get-pip.py
+
+              echo '[3/5] 安装 Python 依赖...'
+              pip install -q -r requirements.txt pyinstaller
+
+              echo '[4/5] PyInstaller 打包...'
+              pyinstaller --onefile --name location_detection main.py
+
+              echo '[5/5] 构建完成!'
+              ls -lh dist/location_detection
+              file dist/location_detection
+            "
 
       - name: 验证产物
         run: |
           ls -lh dist/
           file dist/location_detection
-          ldd dist/location_detection 2>/dev/null || true
 
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:
-          name: location_detection-linux-arm64
+          name: location_detection-arm64-glibc2.31
           path: dist/location_detection
           retention-days: 30
