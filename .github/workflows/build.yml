@@ -45,7 +45,6 @@ jobs:
 
               echo '构建完成!'
               ls -lh dist/location_detection
-              file dist/location_detection
             "
 
       - name: 验证产物
