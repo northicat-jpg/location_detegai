@@ -7,6 +7,8 @@
     "measure_interval": 0.5,
     "query_interval": 5.0,
     "distance_threshold_mm": 2500,
+    "avg_sample_count": 7,
+    "avg_send_interval": 5.0,
     "client_location_map": {
         "191.13.15.200:6060": "WB-1",
         "191.13.15.200:6070": "WA-1"

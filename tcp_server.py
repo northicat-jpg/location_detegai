@@ -12,8 +12,9 @@ import threading
 import time
 
 import db
+from averager import Averager
 from protocol import parse_frame, CMD_READ
-from config import DISTANCE_THRESHOLD_MM, TCP_BACKLOG
+from config import DISTANCE_THRESHOLD_MM, TCP_BACKLOG, AVG_SAMPLE_COUNT, AVG_SEND_INTERVAL
 
 
 class TCPServer:
@@ -126,7 +127,8 @@ class TCPServer:
                     print(f"[TCP] 警告: 客户端 {client_key} 未配置库位映射, 请在 CLIENT_LOCATION_MAP 中添加")
 
                 with self._lock:
-                    client_info = {"sock": client, "addr": addr, "buf": bytearray(), "location": location}
+                    client_info = {"sock": client, "addr": addr, "buf": bytearray(), "location": location,
+                                   "averager": Averager(AVG_SAMPLE_COUNT, AVG_SEND_INTERVAL)}
                     self._clients.append(client_info)
                     count = len(self._clients)
                 loc_tag = f" [{location}]" if location else ""
@@ -205,6 +207,10 @@ class TCPServer:
                     occupied = "占用" if distance < DISTANCE_THRESHOLD_MM else "空闲"
                     print(f"{loc_tag} [距离] {distance} mm ({distance / 10:.1f} cm) → {occupied}")
 
-                    # 自动更新对应库位的数据库状态
-                    if location:
-                        db.update_location(occupied, location)
+                    # 先经过去极值平均器, 满足条件才写数据库
+                    if location and client_info.get("averager"):
+                        avg_dist = client_info["averager"].add_reading(distance)
+                        if avg_dist is not None:
+                            avg_occupied = "占用" if avg_dist < DISTANCE_THRESHOLD_MM else "空闲"
+                            print(f"{loc_tag} [平均] {avg_dist} mm → {avg_occupied} (写入数据库)")
+                            db.update_location(avg_occupied, location)

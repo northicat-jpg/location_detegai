@@ -55,6 +55,10 @@ MEASURE_INTERVAL = _cfg.get("measure_interval", 0.5)
 QUERY_INTERVAL = _cfg.get("query_interval", 5.0)
 DISTANCE_THRESHOLD_MM = _cfg.get("distance_threshold_mm", 2500)
 
+# === 数据采集平均 ===
+AVG_SAMPLE_COUNT = _cfg.get("avg_sample_count", 7)        # 每组采集次数
+AVG_SEND_INTERVAL = _cfg.get("avg_send_interval", 5.0)     # 每次发送间隔（秒）
+
 # === 客户端到库位编码映射 ===
 CLIENT_LOCATION_MAP = _cfg.get("client_location_map", {})
 
