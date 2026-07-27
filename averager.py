@@ -54,7 +54,3 @@ class Averager:
 
         self._last_send_time = now
         return avg
-
-    def reset(self):
-        """清空采集缓冲区"""
-        self._readings.clear()

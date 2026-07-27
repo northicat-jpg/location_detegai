@@ -2,7 +2,6 @@
 import logging
 import time
 import pymysql
-from pymysql.cursors import DictCursor
 from datetime import datetime
 from threading import Lock
 

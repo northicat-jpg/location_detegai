@@ -12,10 +12,9 @@
 import argparse
 import time
 import sys
-import db
 
 from tcp_server import TCPServer
-from config import TCP_HOST, TCP_PORT, MEASURE_INTERVAL, QUERY_INTERVAL, DISTANCE_THRESHOLD_MM, CLIENT_LOCATION_MAP
+from config import TCP_HOST, TCP_PORT, QUERY_INTERVAL, DISTANCE_THRESHOLD_MM, CLIENT_LOCATION_MAP
 
 
 
@@ -109,5 +108,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # db.update_location("占用", "H1J-ZSJ06-01")
 
