@@ -89,7 +89,10 @@ class TCPServer:
             try:
                 c["sock"].sendall(data)
                 success = True
-                print(f"{loc_tag} [发送] {data.hex(' ').upper()} ({len(data)} 字节)")
+                # ============================================================
+                # 调试用: 取消注释下面这行可查看发送的原始十六进制数据
+                # ============================================================
+                # print(f"{loc_tag} [发送] {data.hex(' ').upper()} ({len(data)} 字节)")
             except OSError as e:
                 print(f"{loc_tag} [发送失败] {e}")
         return success
@@ -188,8 +191,10 @@ class TCPServer:
         ip_port = f"{addr[0]}:{addr[1]}"
         loc_tag = f"[{location}] {ip_port}" if location else f"[{ip_port}]"
 
-        # 打印接收数据（锁外打印，避免阻塞）
-        print(f"{loc_tag} [接收] {data.hex(' ').upper()} ({len(data)} 字节)")
+        # ================================================================
+        # 调试用: 取消注释下面这行可查看传感器上报的原始十六进制数据
+        # ================================================================
+        # print(f"{loc_tag} [接收] {data.hex(' ').upper()} ({len(data)} 字节)")
 
         with self._lock:
             buf.extend(data)
@@ -204,13 +209,17 @@ class TCPServer:
                 if distance is not None:
                     self._distance = distance
                     self._distance_event.set()
-                    occupied = "占用" if distance < DISTANCE_THRESHOLD_MM else "空闲"
-                    print(f"{loc_tag} [距离] {distance} mm ({distance / 10:.1f} cm) → {occupied}")
+                    # ============================================================
+                    # 调试用: 取消注释下面这行可查看每次接收到的原始距离值
+                    # ============================================================
+                    # occupied = "占用" if distance < DISTANCE_THRESHOLD_MM else "空闲"
+                    # print(f"{loc_tag} [距离] {distance} mm ({distance / 10:.1f} cm) → {occupied}")
 
                     # 先经过去极值平均器, 满足条件才写数据库
                     if location and client_info.get("averager"):
                         avg_dist = client_info["averager"].add_reading(distance)
                         if avg_dist is not None:
+                            raw = client_info["averager"].last_raw_readings
                             avg_occupied = "占用" if avg_dist < DISTANCE_THRESHOLD_MM else "空闲"
-                            print(f"{loc_tag} [平均] {avg_dist} mm → {avg_occupied} (写入数据库)")
+                            print(f"{loc_tag} 原始: {raw} → 去极值平均: {avg_dist} mm → {avg_occupied} (写入数据库)")
                             db.update_location(avg_occupied, location)

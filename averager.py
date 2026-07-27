@@ -25,7 +25,13 @@ class Averager:
         """数据库写入最小间隔（秒）"""
 
         self._readings: list[int] = []
+        self._last_raw_readings: list[int] = []  # 最近一轮的原始数据，供终端显示
         self._last_send_time: float = 0.0
+
+    @property
+    def last_raw_readings(self) -> list[int]:
+        """最近一轮参与去极值平均的原始数据"""
+        return list(self._last_raw_readings)
 
     def add_reading(self, distance: int) -> int | None:
         """
@@ -42,6 +48,7 @@ class Averager:
             return None
 
         # 排序后去掉最小和最大值, 对剩余数据求平均
+        self._last_raw_readings = list(self._readings)  # 保存原始数据供终端显示
         sorted_r = sorted(self._readings)
         trimmed = sorted_r[1:-1]  # 去除极值
         avg = round(sum(trimmed) / len(trimmed))
